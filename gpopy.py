@@ -2,19 +2,11 @@
 #writted by Lucas Guerra Borges
 #lu.guerra7508@gmail.com
 #-----------------------------------------------------------------# 
-
 import random as rd
 import pprint
 from types import FunctionType
 from operator import itemgetter
 
-PARAMS = {
-   "learning_rate" : rd.random,
-   "epochs" : [32, 64, 128],
-   "layers" : [32, 64,128, 256],
-   "threshold" : 0.8,
-   "activation" : ["relu", "tangh", "sigmoid", 'softmax']
-}
 
 def activate_param (param, attribute): 
     """ evaluate what value should be evaluated coming from PARAMS structure"""
@@ -33,7 +25,6 @@ def activate_param (param, attribute):
         update = { param : attribute}
     return update 
 
-#grid search
 class Tunning(): 
     
     first_parent = {}
