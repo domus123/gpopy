@@ -139,6 +139,31 @@ second_best_match = tunning.second_parent
         return a * (x ** 2) + b * x
     }
 ```
+
+<h5>Saving your ML/DL models</h5>
+<p> Since most of ML and DL are instantiated with random weights, some times under the same circunstance (PARAMS) we can obtain different test results </p>
+<p> For resolving this, we added a option to "score" function to save models and reuse it later </p>
+
+```python
+
+    tunning.score(save_model= True)
+    #or just
+    #tunning.score(True)
+    
+    score, model = tunning.top_model #HA
+    model.evaluate(x_test, y_test, verbose=0)
+
+```
+
+<h5> ATTENTION </h5>
+<p> IF save_model= True, your score function should be returning a tupple, that constains (score, model), been model any function or value that you want to hold on memory </p>
+
+```python 
+    #model function returning from Keras 
+    return (score[1], model)
+```
+
+
 As was told earlier, GPOPY run Genetic algorithm on ANY function that meet those especifications, not only for ML and Neural Net Models.
 
 
