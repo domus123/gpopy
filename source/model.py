@@ -56,7 +56,6 @@ def model (data, x_train = x_train, x_test = x_test,
     use_bias = data['use_bias']
 
     model = Sequential()
-    model.add(Conv2D(filters = filters, kernel_size = (784,), 
     model.add(Dense(layer, activation= activation, input_shape=(784,)))
     model.add(Dropout(dropout))
     model.add(Dense(layer, activation=activation))
@@ -80,8 +79,9 @@ def model (data, x_train = x_train, x_test = x_test,
     print('Test loss:', score[0])
     print('Test accuracy:', score[1])
     print("######################################################################")
-    return score[1]
+    return (score[1], model)
 
-tunning = Tunning(PARAMS, population_size=4, maximum_generation=20)
-tunning.set_score(model)
-res = tunning.run()
+#tunning = Tunning(PARAMS, population_size=4, maximum_generation=20)
+#tunning.set_score(model)
+#res = tunning.run()
+

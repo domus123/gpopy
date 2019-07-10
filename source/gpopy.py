@@ -7,6 +7,15 @@ import pprint
 from types import FunctionType
 from operator import itemgetter
 
+__VERSION__ = 0.1
+__GIT__ = "https://github.com/domus123/gpopy"
+
+def tunning_header(): 
+    """Print tunning header """
+    print("GPOPY")
+    print(f"VERSION: {__VERSION__}")
+    print("HELP US IMPROVE")
+    print(f"BUGS AND SUGESTION AT : {__GIT__}")
 
 def activate_param (param, attribute): 
     """ evaluate what value should be evaluated coming from PARAMS structure"""
@@ -32,23 +41,23 @@ class Tunning():
     population = None
     score_function = None
     top_score = 0
+    score_function = None
+    top_model = None
+    genetic_tree = []
 
-    def __init__(self, params, score= None,  population_size = 2, maximum_generation = 20,mutation_rate = 0.25 ):
+    def __init__(self, params,  population_size = 2, maximum_generation = 20,mutation_rate = 0.25 ):
         self.params = params
         self.population_size = population_size
         self.maximum_generation = maximum_generation
         self.mutation_rate = mutation_rate
-
-    def run(self):
+        print(f"{pprint.pprint(params)}")
+       
+    def run(self, save_model = False):
         """Automaticly run the algorithm with maximum number of generation """
-        evolution_track = [] 
         for i in range(self.maximum_generation): 
             self.gen_population()
-            self.score()
+            self.score(save_model)
             print(f"##### Generation {i}   |   TopScore {self.top_score} #####")
-            run_result = (self.top_score, self.first_parent)
-            evolution_track.append(run_result)
-        return evolution_track
 
     def create_individue(self) : 
         """ Create new individue based on self.params given when the class was created"""
@@ -124,15 +133,30 @@ class Tunning():
         """ change score function for individue """
         self.score_function = score
     
-    def score(self):         
+    def score(self, save_model = False):   
+        """ Calculate the score returned from score_function and save score with/without model"""      
         if self.score_function == None : 
             assert False, "No score function setted, you can set it using set_score(func) or passing score= func during class instantiation"
 
         for i in self.population: 
-            i['score'] = self.score_function(i)
+            print(f"Scoring on ... {i}")
+            if save_model:
+                (score, model) = self.score_function(i)
+                if (score > self.top_score) :
+                    #save only the BEST model in memory, since keep then all may be memory expensive with big models
+                    print("###################################################################")
+                    print(f"New optimal model founded with a score of {score} ")
+                    print("###################################################################")
+                    self.top_model = (score, model)
+                i['score'] = score
+            else :
+                i['score'] = self.score_function(i)
+
         sorted_list = sorted(self.population, key= itemgetter('score'), reverse= True)
         self.first_parent = sorted_list[0]
         self.second_parent = sorted_list[1]
         self.top_score = self.first_parent['score']
+        self.genetic_tree.append(self.first_parent)
 
 
+tunning_header() 
