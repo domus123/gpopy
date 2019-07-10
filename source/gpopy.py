@@ -33,13 +33,14 @@ class Tunning():
     score_function = None
     top_score = 0
 
-    def __init__(self, params, score= None,  population_size = 4, maximum_generation = 20,mutation_rate = 0.25 ):
+    def __init__(self, params, score= None,  population_size = 2, maximum_generation = 20,mutation_rate = 0.25 ):
         self.params = params
         self.population_size = population_size
         self.maximum_generation = maximum_generation
         self.mutation_rate = mutation_rate
 
-    def run(self): 
+    def run(self):
+        """Automaticly run the algorithm with maximum number of generation """
         evolution_track = [] 
         for i in range(self.maximum_generation): 
             self.gen_population()
@@ -50,7 +51,7 @@ class Tunning():
         return evolution_track
 
     def create_individue(self) : 
-        """ Create new individue based on self.params given when the class was created"""     
+        """ Create new individue based on self.params given when the class was created"""
         individue = {"score" : 0} 
         for param in self.params: 
             attribute = self.params[param]
