@@ -76,7 +76,7 @@ This type is good when you already now a parameter that you don't want to change
 <h6> Constructor </h6>
 
 ```python
-Tunning(params, score = None, population_size = 4, maximum_generation = 20, mutation_rate = 0.25)
+Tunning(params, population_size = 4, maximum_generation = 20, mutation_rate = 0.25)
 
 ```
 <p> params: </h5>  Dict with all the params that will be used to generate your population
