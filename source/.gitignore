@@ -1,0 +1,8 @@
+#folders
+__pycache__/
+pip/
+
+
+#emacs and other buffers
+*~
+*.ipynb
