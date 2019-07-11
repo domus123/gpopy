@@ -1,5 +1,5 @@
 <h1> GPOPY </h1>
-<h2> GPOPY is a way to optimize parameters in a easy way </h2> 
+<h2> GPOPY optimize your parameters easily </h2> 
 
 <p> GPOPY was build using a genetic algorithm, that will handle parameter optimizations for you in any problem </p> 
 
