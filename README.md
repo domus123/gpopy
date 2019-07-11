@@ -3,19 +3,17 @@
 
 <p> GPOPY was build using a genetic algorithm, that will handle parameter optimizations for you in any problem </p> 
 
-<h5> Declaring parameters </h5>
-<h6> In order to GPOPY understand your parameters, they must be declared inside of a dict file </h6>
-
-
-
 <h5> Installation </h5>
 <p> Gpopy now can be installed using pip </p>
 
 ```
     pip install gpopy
 ```
-
 <p> Or cloning the repository and importing the file from there on your project </p>
+
+<h5> Declaring parameters </h5>
+<h6> In order to GPOPY understand your parameters, they must be declared inside of a dict file </h6>
+
 
 
 ```python 
