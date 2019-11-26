@@ -175,6 +175,9 @@ second_best_match = tunning.second_parent
 
 As was told earlier, GPOPY run Genetic algorithm on ANY function that meet those especifications, not only for ML and Neural Net Models.
 
+<h3> TODO </h3>
+<p> Initial Model option </p>
+<p> More crossover and mutation methods <p> 
 
 <h4> Final Notes </h4>
 <p> Few free to use, edit and make all the changes needed in the code </p>
