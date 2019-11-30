@@ -1,24 +1,35 @@
-#Generic Algorithm Hyper Parameter Optimization (GHPO)
+#Generic Algorithm Hyper Parameter Optimization Python (GPOPY)
 #writted by Lucas Guerra Borges
 #lu.guerra7508@gmail.com
 #-----------------------------------------------------------------# 
 import random as rd
 import pprint
+import mlflow 
 from types import FunctionType
 from operator import itemgetter
+from visualization import mlflow_tracking
 
-__VERSION__ = 0.1
+__VERSION__ = 0.9
 __GIT__ = "https://github.com/domus123/gpopy"
 
-def tunning_header(): 
+def header(): 
     """Print tunning header """
     print("GPOPY")
     print(f"VERSION: {__VERSION__}")
     print("HELP US IMPROVE")
     print(f"BUGS AND SUGESTION AT : {__GIT__}")
+    print("Added support to MLFlow tracking\n")
+
+header()
 
 def activate_param (param, attribute): 
-    """ evaluate what value should be evaluated coming from PARAMS structure"""
+    """ Evaluate what value should be evaluated coming from PARAMS structure
+        Inputs:
+            param: Is one of the keys defined in your param dict
+            attribute: Is the value associate with this param
+        return: 
+            upadate: The parameter evaluated according with your definition 
+    """
     if (isinstance(attribute, list) or isinstance(attribute, tuple)) :
         length = len(attribute)
         select_elem = rd.randint(0, length - 1)
@@ -41,11 +52,12 @@ class Tunning():
     population = None
     score_function = None
     top_score = 0
+    generation = 0
     score_function = None
     top_model = None
     genetic_tree = []
 
-    def __init__(self, params,  population_size = 2, maximum_generation = 20,mutation_rate = 0.25 ):
+    def __init__(self, params,  population_size = 2, maximum_generation = 20, mutation_rate = 0.25):
         self.params = params
         self.population_size = population_size
         self.maximum_generation = maximum_generation
@@ -74,6 +86,7 @@ class Tunning():
 
     def gen_population(self):
         """Hold the creation of new individues"""
+        
         if (self.first_parent == {}) and (self.second_parent == {}) :
             pop = []
             for i in range(self.population_size): 
@@ -135,13 +148,14 @@ class Tunning():
     
     def score(self, save_model = False):   
         """ Calculate the score returned from score_function and save score with/without model"""      
-        if self.score_function == None : 
+        if self.score_function == None: 
             assert False, "No score function setted, you can set it using set_score(func) or passing score= func during class instantiation"
 
         for i in self.population: 
             print(f"Scoring on ... {i}")
             if save_model:
                 (score, model) = self.score_function(i)
+                #TODO Change the > for any custom predicate 
                 if (score > self.top_score) :
                     #save only the BEST model in memory, since keep then all may be memory expensive with big models
                     print("###################################################################")
@@ -151,12 +165,82 @@ class Tunning():
                 i['score'] = score
             else :
                 i['score'] = self.score_function(i)
-
+        self.generation +=1 
         sorted_list = sorted(self.population, key= itemgetter('score'), reverse= True)
         self.first_parent = sorted_list[0]
         self.second_parent = sorted_list[1]
         self.top_score = self.first_parent['score']
         self.genetic_tree.append(self.first_parent)
 
+class FlowTunning(Tunning): 
+    """ 
+        This class was designed for using mlflow as a visualization tool and for saving your model
+        
+        Since you're using MLFlow, you should set in your environment the details such as artifacts, experiments and enviroment.
+        You can set it before calling tunning. 
 
-tunning_header() 
+        What we wanted with this class is a way to keep track of informations and use it to visualize.
+        You can track only the hyper parameters evolutions over the generations, or you can use a full MLFlow approach with your custom score and run functions.
+    """
+    def __init__(self, params, population_size=2, maximum_generation=20, mutation_rate=0.25, experiment_name="", auto_track=True):
+        """ 
+            Track_best: Boolean 
+            The default value assumes that you don't customize your model with MLFlow and is using only GPOPY parameters as comparision,
+            and for saving your models (In memory).
+            More details on advanced logs and how mlflow can save your models MLFlow documentation at: https://www.mlflow.org/docs/latest/index.html
+        """
+        super().__init__(params, population_size, maximum_generation, mutation_rate)
+        self.experiment_name = experiment_name
+        self.tracking = auto_track 
+
+    def mlflow_tracking(self, params, score, generation="None"):
+        """
+        Get the params of the network and log it to mlflow with a few parameters>
+        Inputs: 
+            params: A dict with all the values that was used in the algorithm 
+            score: The result from running the model with 
+        Return: None 
+        """
+        print(f"Params: {params}")
+        #score, model = top_score 
+        print(f"Score: {score}")
+        params.pop('score', None) #Removing the model that came with params
+        with mlflow.start_run():
+            mlflow.set_tag("Generation", generation)
+            mlflow.log_param("Generation", generation)
+            mlflow.log_params(params)
+            mlflow.log_metric("Score", score)
+
+    def run(self): 
+        print("Running while logging")
+        for i in range(self.maximum_generation): 
+            self.gen_population()
+            if self.tracking: 
+               self.easy_score(i)
+            else: 
+                pass 
+
+    def easy_score(self, generation): 
+        """
+        Let GPOPY handle saves and scores 
+        #TODO: Change this method, seems duplicated 
+        """
+        if self.score_function == None: 
+            assert False, "No score function setted, you can set it using set_score(func) or passing score= func during class instantiation"
+        top_params = {} 
+        for i, elem in enumerate(self.population): 
+            score, model = self.score_function(elem)
+            if score > self.top_score: 
+                print(f"*** New optimal model founded with a score of {score} ***")
+                self.top_score = score
+                self.top_model = (score, model)
+            elem['score'] = score
+
+        sorted_list = sorted(self.population, key= itemgetter('score'), reverse= True)
+        self.first_parent = sorted_list[0]
+        self.second_parent = sorted_list[1]
+        generation_top_score = self.first_parent['score']
+        self.genetic_tree.append(self.first_parent)
+        print(f"Better parent {self.first_parent}")
+        print("DONE")
+        self.mlflow_tracking(self.first_parent, generation_top_score, generation + 1) ## Simple version using mlflow 
