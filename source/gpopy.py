@@ -7,9 +7,8 @@ import pprint
 import mlflow 
 from types import FunctionType
 from operator import itemgetter
-from visualization import mlflow_tracking
 
-__VERSION__ = 1.0.0
+__VERSION__ = "1.0.0"
 __GIT__ = "https://github.com/domus123/gpopy"
 
 def header(): 
