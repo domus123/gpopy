@@ -9,7 +9,7 @@ from types import FunctionType
 from operator import itemgetter
 from visualization import mlflow_tracking
 
-__VERSION__ = 0.9
+__VERSION__ = 1.0.0
 __GIT__ = "https://github.com/domus123/gpopy"
 
 def header(): 
@@ -218,7 +218,7 @@ class FlowTunning(Tunning):
             if self.tracking: 
                self.easy_score(i)
             else: 
-                pass 
+                self.detailed_score(i) 
 
     def easy_score(self, generation): 
         """
@@ -244,3 +244,37 @@ class FlowTunning(Tunning):
         print(f"Better parent {self.first_parent}")
         print("DONE")
         self.mlflow_tracking(self.first_parent, generation_top_score, generation + 1) ## Simple version using mlflow 
+
+    def detailed_score(self, generation): 
+        """
+        A more detailed run with mlflow.
+        While use this function, is recomended that you use the mlflow tracking function for the model you're using.
+        e.g You can use mlflow tracking on Tensorflow, torch, scikit ... 
+        
+        TODO: Merge this function with easy_score, and pass the paramater used on run as parameter for easy_score
+        This fix will be available 
+        """
+        if self.score_function == None: 
+            assert False, "No score function setted, you can set it using set_score(func) or passing score= func during class instantiation"
+        for i, elem in enumerate(self.population): 
+            with mlflow.start_run() as run: 
+                tags = {
+                    'generation': generation + 1, 
+                    'individue' : i  + 1
+                }
+                mlflow.set_tags(tags)
+                mlflow.log_param("Generation", generation + 1)
+                score, model = self.score_function(elem)
+            if score > self.top_score: 
+                print(f"*** New optimal model founded with a score of {score} ***")
+                self.top_score = score
+                self.top_model = (score, model)
+            elem['score'] = score
+        sorted_list = sorted(self.population, key= itemgetter('score'), reverse= True)
+        self.first_parent = sorted_list[0]
+        self.second_parent = sorted_list[1]
+        generation_top_score = self.first_parent['score']
+        self.genetic_tree.append(self.first_parent)
+        print(f"Better parent {self.first_parent}")
+        print("DONE")
+        

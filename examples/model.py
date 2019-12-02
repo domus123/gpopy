@@ -2,7 +2,7 @@ from keras.datasets import mnist
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Conv2D
 from keras.optimizers import RMSprop
-from gpopy import FlowTunning 
+from gpopy import Tunning 
 import keras
 import random
 
@@ -11,9 +11,9 @@ num_classes = 10
 #epochs = 20
 
 PARAMS = {
-    'batch_size' : [ 8,16,32,64,128,256],
-    'epochs' : [8, 16, 32, 64],
-    'dense_layers' : [64, 128, 256, 512],
+    'batch_size' : [256], #[ 8,16], #,32,64,128,256],
+    'epochs' : [8, 16],# 32, 64],
+    'dense_layers' : [64, 128],#, 256, 512],
     'dropout' : {
         'func' : random.uniform, 
         'params' : [0.3, 0.7] 
@@ -81,8 +81,7 @@ def model (data, x_train = x_train, x_test = x_test,
     print("######################################################################")
     return (score[1], model)
 
-tunning = FlowTunning(params=PARAMS, population_size=4)
-
+tunning = Tunning(experiment='MNIST optimization with GPOPY', params=PARAMS, population_size=2, maximum_generation=4, tracking=True)
 tunning.set_score(model)
-tunning.run()
+res = tunning.run()
 

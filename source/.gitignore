@@ -1,7 +1,8 @@
 #folders
 __pycache__/
 pip/
-
+mlruns
+.vscode
 
 #emacs and other buffers
 *~
