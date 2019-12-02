@@ -205,7 +205,7 @@ second_best_match = tunning.second_parent
 
 ```python 
 #Example
-from gpopy import FlowTunning 
+from gpopy.gpopy import FlowTunning 
 
 #Your code and params here 
 #You can see this example at examples/simple_track_model.py 
